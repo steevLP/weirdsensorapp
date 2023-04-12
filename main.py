@@ -2,6 +2,8 @@ import os
 import datetime
 import requests
 import sqlite3
+import tkinter as tk
+import matplotlib.pyplot as plt
 import csv
 
 # Software Configuration
@@ -9,6 +11,7 @@ day = 1
 month = 1
 year = 2023
 dbp = "app.db"
+windows = tk.Tk()
 
 # 404 Data response
 empty = '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
@@ -61,3 +64,33 @@ c.execute("INSERT INTO sen_data VALUES ('2006-01-05','BUY','RHAT',100,35.14)")
 
 db.commit()
 db.close()
+
+# ================================================ #
+#                 graph plotting                   #
+#                does not work atm                 #
+# ================================================ #
+fig = plt.figure()
+
+# x axis values
+x = [1, 2, 3]
+# corresponding y axis values
+y = [2, 4, 1]
+
+# plotting the points
+plt.plot(x, y)
+
+# naming the x axis
+plt.xlabel('x - axis')
+# naming the y axis
+plt.ylabel('y - axis')
+
+# giving a title to my graph
+plt.title('My first graph!')
+
+# ================================================================ #
+#                            window code                           #
+# displays the windows for the frontend i for somereason need      #
+# ================================================================ #
+greeting = tk.Label(text="Hello, Tkinter")
+greeting.pack()
+windows.mainloop()
