@@ -1,3 +1,4 @@
+import array
 import os
 import datetime
 
@@ -8,7 +9,6 @@ import csv
 import sys
 
 from PyQt6 import QtWidgets
-from pyqtgraph import PlotWidget, plot
 import pyqtgraph as pg
 
 # downloads all required data from target server
@@ -76,12 +76,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.graphWidget = pg.PlotWidget()
         self.setCentralWidget(self.graphWidget)
 
-        # data
-        hour = d1
-        temperature = d2
-
         # plot data: x, y values
-        self.graphWidget.plot(hour, temperature)
+        self.graphWidget.plot(d1)
 
 
 def main():
@@ -90,6 +86,13 @@ def main():
     month = 1
     year = 2023
     dbp = "app.db"
+
+    # proccessed data
+    label = []
+    value = []
+
+    # download data and store them for later use
+    fetchData(year, month, day)
 
     # initialize sqlite database
     # delete sqlitedb on each startup
@@ -103,19 +106,21 @@ def main():
 
     storeindb(c, dbc, "./data")
 
+    data = c.execute("SELECT P1 from sen_data;").fetchall()
     dbc.close()
 
-    # download data and store them for later use
-    fetchData(year, month, day)
+    # proccesses the results coming from the databse
+    for i in data:
+        # filters all values that are higher then 100
+        if float(i[0]) < 100.0:
+            value += [float(i[0])]
 
-    # proccessed data
-    label = [1,2,3,4,5,6,7,8,9,10]
-    value = [30,32,34,32,33,31,29,32,35,45]
-
+    # plt.plot(label, value)
+    # plt.show()
 
     # setup gui and start it
     app = QtWidgets.QApplication(sys.argv)
-    main = MainWindow(label,value)
+    main = MainWindow(value, [])
     main.show()
     sys.exit(app.exec())
 
