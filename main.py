@@ -2,16 +2,17 @@ import os
 import datetime
 import requests
 import sqlite3
-import tkinter as tk
-import matplotlib.pyplot as plt
 import csv
+import sys
+
+from PyQt6.QtWidgets import QApplication, QLabel, QWidget
 
 # Software Configuration
 day = 1
 month = 1
 year = 2023
 dbp = "app.db"
-windows = tk.Tk()
+app = QApplication([])
 
 # 404 Data response
 empty = '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
@@ -57,40 +58,22 @@ db = sqlite3.connect(dbp)
 # import dataset
 c = db.cursor()
 
-c.execute('''CREATE TABLE sen_data
-             (date text, trans text, symbol text, qty real, price real)''')
+# sensor_id;sensor_type;location;lat;lon;timestamp;P1;durP1;ratioP1;P2;durP2;ratioP2
+# 3659;SDS011;1846;51.482;7.224;2023-01-01T00:02:05;19.93;;;10.50;;
+# c.execute('''CREATE TABLE sen_data (sensor_id;sensor_type;location;lat;lon;timestamp;P2)''')
 
-c.execute("INSERT INTO sen_data VALUES ('2006-01-05','BUY','RHAT',100,35.14)")
+# c.execute("INSERT INTO sen_data VALUES ('2006-01-05','BUY','RHAT',100,35.14)")
 
-db.commit()
-db.close()
+# db.commit()
+# db.close()
 
-# ================================================ #
-#                 graph plotting                   #
-#                does not work atm                 #
-# ================================================ #
-fig = plt.figure()
+# the window
+window = QWidget()
+window.setWindowTitle("PyQt App")
+window.setGeometry(100, 100, 280, 80)
+helloMsg = QLabel("<h1>Hello, World!</h1>", parent=window)
+helloMsg.move(60, 15)
 
-# x axis values
-x = [1, 2, 3]
-# corresponding y axis values
-y = [2, 4, 1]
-
-# plotting the points
-plt.plot(x, y)
-
-# naming the x axis
-plt.xlabel('x - axis')
-# naming the y axis
-plt.ylabel('y - axis')
-
-# giving a title to my graph
-plt.title('My first graph!')
-
-# ================================================================ #
-#                            window code                           #
-# displays the windows for the frontend i for somereason need      #
-# ================================================================ #
-greeting = tk.Label(text="Hello, Tkinter")
-greeting.pack()
-windows.mainloop()
+# show the window
+window.show()
+sys.exit(app.exec())
