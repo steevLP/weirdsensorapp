@@ -1,5 +1,7 @@
 import os
 import datetime
+
+import numpy
 import requests
 import sqlite3
 import csv
@@ -46,15 +48,26 @@ def fetchData(year, month, day):
             print("add year")
 
 # creates database and handles file storage
-#def storeindb(dbp):
-    # sensor_id;sensor_type;location;lat;lon;timestamp;P1;durP1;ratioP1;P2;durP2;ratioP2
-    # 3659;SDS011;1846;51.482;7.224;2023-01-01T00:02:05;19.93;;;10.50;;
-    # c.execute('''CREATE TABLE sen_data (sensor_id;sensor_type;location;lat;lon;timestamp;P2)''')
+def storeindb(c, db, path):
+    directory = os.fsencode(path)
 
-    # c.execute("INSERT INTO sen_data VALUES ('2006-01-05','BUY','RHAT',100,35.14)")
-
-    # db.commit()
-    # db.close()
+    for file in os.listdir(directory):
+        filename = os.fsdecode(file)
+        if filename.endswith(".csv"):
+            # print(os.path.join(directory, filename))
+            with open(path + "/" + filename, newline='') as csvfile:
+                data = csv.reader(csvfile, delimiter=';')
+                for row in data:
+                    print(row)
+                    if row[0] == "sensor_id":
+                        continue
+                    else:
+                        todo = numpy.array([row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[9]])
+                        c.execute("INSERT INTO sen_data VALUES (?,?,?,?,?,?,?,?)",todo)
+                        continue
+        else:
+            continue
+    db.commit()
 
 # function for the handling the main window
 class MainWindow(QtWidgets.QMainWindow):
@@ -63,6 +76,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.graphWidget = pg.PlotWidget()
         self.setCentralWidget(self.graphWidget)
 
+        # data
         hour = d1
         temperature = d2
 
@@ -83,10 +97,13 @@ def main():
         os.remove(dbp)
 
     # create new database
-    db = sqlite3.connect(dbp)
+    dbc = sqlite3.connect(dbp)
+    c = dbc.cursor()
+    c.execute('''CREATE TABLE sen_data (sensor_id,sensor_type,location,lat,lon,timestamp,P1,P2);''')
 
-    # import dataset
-    c = db.cursor()
+    storeindb(c, dbc, "./data")
+
+    dbc.close()
 
     # download data and store them for later use
     fetchData(year, month, day)
